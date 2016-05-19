@@ -100,6 +100,7 @@ jsonValue* jsonParser::parse(char* content, int size)
   char *ps = content;
   char *p = ps;
   char *pe = content + size;
+  char *eof = pe;
 
   // user defined
   char* tstart = NULL; 

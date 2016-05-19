@@ -414,6 +414,7 @@ jsonValue* jsonParser::parse(char* content, int size)
   char *ps = content;
   char *p = ps;
   char *pe = content + size;
+  char *eof = pe;
 
   // user defined
   char* tstart = NULL; 
@@ -421,15 +422,15 @@ jsonValue* jsonParser::parse(char* content, int size)
   std::vector<int> array_i;
 
   
-#line 425 "src/json_parser.cc"
+#line 426 "src/json_parser.cc"
 	{
 	cs = jsonParser_start;
 	top = 0;
 	}
 
-#line 110 "src/json_parser.rl"
+#line 111 "src/json_parser.rl"
   
-#line 433 "src/json_parser.cc"
+#line 434 "src/json_parser.cc"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -595,7 +596,7 @@ _match:
     {cs = stack[--top]; goto _again;}
   }
 	break;
-#line 599 "src/json_parser.cc"
+#line 600 "src/json_parser.cc"
 		}
 	}
 
@@ -643,7 +644,7 @@ _again:
     PB(json_string(tstart+1, p-1));
   }
 	break;
-#line 647 "src/json_parser.cc"
+#line 648 "src/json_parser.cc"
 		}
 	}
 	}
@@ -651,7 +652,7 @@ _again:
 	_out: {}
 	}
 
-#line 111 "src/json_parser.rl"
+#line 112 "src/json_parser.rl"
 
   if (p != pe)
   {

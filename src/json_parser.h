@@ -1,5 +1,4 @@
-#ifndef __YINSPIRE__JSON_PARSER__
-#define __YINSPIRE__JSON_PARSER__
+#pragma once
 
 #include "json.h"
 
@@ -11,5 +10,3 @@ class jsonParser
     static jsonValue* parse_file(const char* filename);
     static jsonValue* parse_file_mmap(const char* filename);
 };
-
-#endif

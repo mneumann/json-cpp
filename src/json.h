@@ -1,5 +1,4 @@
-#ifndef __YINSPIRE__JSON__
-#define __YINSPIRE__JSON__
+#pragma once
 
 #include <ostream>
 #include <string>
@@ -178,5 +177,3 @@ class jsonHash : public jsonValue
     void set(jsonString* key, jsonValue* value);
     virtual const char* type();
 };
-
-#endif
