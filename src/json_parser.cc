@@ -1,5 +1,7 @@
-#line 1 "src/json/json_parser.rl"
-#line 62 "src/json/json_parser.rl"
+
+#line 1 "src/json_parser.rl"
+
+#line 62 "src/json_parser.rl"
 
 
 #include <vector>
@@ -29,7 +31,7 @@ inline static jsonNumber* json_number(char* from, char* to, char* buf, int maxsz
 }
 
 
-#line 33 "src/json/json_parser.cc"
+#line 35 "src/json_parser.cc"
 static const char _jsonParser_actions[] = {
 	0, 1, 0, 1, 1, 1, 2, 1, 
 	3, 1, 4, 1, 5, 1, 6, 1, 
@@ -211,7 +213,7 @@ static const short _jsonParser_index_offsets[] = {
 	569, 577, 581, 585, 589, 593, 597, 598
 };
 
-static const unsigned char _jsonParser_trans_targs_wi[] = {
+static const unsigned char _jsonParser_trans_targs[] = {
 	1, 2, 5, 6, 16, 24, 149, 9, 
 	148, 26, 30, 33, 148, 1, 152, 0, 
 	147, 2, 4, 0, 148, 148, 4, 147, 
@@ -289,7 +291,7 @@ static const unsigned char _jsonParser_trans_targs_wi[] = {
 	0, 148, 3, 148, 0, 0, 0, 0
 };
 
-static const unsigned char _jsonParser_trans_actions_wi[] = {
+static const unsigned char _jsonParser_trans_actions[] = {
 	0, 15, 15, 7, 7, 0, 7, 0, 
 	25, 0, 0, 0, 23, 0, 7, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
@@ -367,6 +369,29 @@ static const unsigned char _jsonParser_trans_actions_wi[] = {
 	0, 3, 3, 3, 0, 0, 0, 0
 };
 
+static const unsigned char _jsonParser_eof_actions[] = {
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 17, 0, 9, 9, 9, 
+	9, 11, 13, 5, 1, 3, 0, 0
+};
+
 static const int jsonParser_start = 1;
 static const int jsonParser_first_final = 147;
 static const int jsonParser_error = 0;
@@ -375,7 +400,8 @@ static const int jsonParser_en_main = 1;
 static const int jsonParser_en_hash = 36;
 static const int jsonParser_en_array = 97;
 
-#line 91 "src/json/json_parser.rl"
+
+#line 91 "src/json_parser.rl"
 
 jsonValue* jsonParser::parse(char* content, int size)
 {
@@ -395,14 +421,15 @@ jsonValue* jsonParser::parse(char* content, int size)
   std::vector<int> array_i;
 
   
-#line 399 "src/json/json_parser.cc"
+#line 425 "src/json_parser.cc"
 	{
 	cs = jsonParser_start;
 	top = 0;
 	}
-#line 110 "src/json/json_parser.rl"
+
+#line 110 "src/json_parser.rl"
   
-#line 406 "src/json/json_parser.cc"
+#line 433 "src/json_parser.cc"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -411,7 +438,7 @@ jsonValue* jsonParser::parse(char* content, int size)
 	const char *_keys;
 
 	if ( p == pe )
-		goto _out;
+		goto _test_eof;
 	if ( cs == 0 )
 		goto _out;
 _resume:
@@ -433,7 +460,7 @@ _resume:
 			else if ( (*p) > *_mid )
 				_lower = _mid + 1;
 			else {
-				_trans += (_mid - _keys);
+				_trans += (unsigned int)(_mid - _keys);
 				goto _match;
 			}
 		}
@@ -456,7 +483,7 @@ _resume:
 			else if ( (*p) > _mid[1] )
 				_lower = _mid + 2;
 			else {
-				_trans += ((_mid - _keys)>>1);
+				_trans += (unsigned int)((_mid - _keys)>>1);
 				goto _match;
 			}
 		}
@@ -464,77 +491,77 @@ _resume:
 	}
 
 _match:
-	cs = _jsonParser_trans_targs_wi[_trans];
+	cs = _jsonParser_trans_targs[_trans];
 
-	if ( _jsonParser_trans_actions_wi[_trans] == 0 )
+	if ( _jsonParser_trans_actions[_trans] == 0 )
 		goto _again;
 
-	_acts = _jsonParser_actions + _jsonParser_trans_actions_wi[_trans];
+	_acts = _jsonParser_actions + _jsonParser_trans_actions[_trans];
 	_nacts = (unsigned int) *_acts++;
 	while ( _nacts-- > 0 )
 	{
 		switch ( *_acts++ )
 		{
 	case 0:
-#line 4 "src/json/json_parser.rl"
+#line 4 "src/json_parser.rl"
 	{ PB(new jsonNull()); }
 	break;
 	case 1:
-#line 6 "src/json/json_parser.rl"
+#line 6 "src/json_parser.rl"
 	{ PB(new jsonTrue()); }
 	break;
 	case 2:
-#line 8 "src/json/json_parser.rl"
+#line 8 "src/json_parser.rl"
 	{ PB(new jsonFalse()); }
 	break;
 	case 3:
-#line 11 "src/json/json_parser.rl"
+#line 11 "src/json_parser.rl"
 	{ tstart=p; }
 	break;
 	case 4:
-#line 11 "src/json/json_parser.rl"
+#line 11 "src/json_parser.rl"
 	{
     PB(json_number(tstart, p, numbuf, numbufsz));
   }
 	break;
 	case 5:
-#line 15 "src/json/json_parser.rl"
+#line 15 "src/json_parser.rl"
 	{ PB(new jsonNumber(INFINITY)); }
 	break;
 	case 6:
-#line 17 "src/json/json_parser.rl"
+#line 17 "src/json_parser.rl"
 	{ PB(new jsonNumber(-INFINITY)); }
 	break;
 	case 7:
-#line 19 "src/json/json_parser.rl"
+#line 19 "src/json_parser.rl"
 	{ tstart=p; }
 	break;
 	case 8:
-#line 19 "src/json/json_parser.rl"
+#line 19 "src/json_parser.rl"
 	{
     PB(json_string(tstart+1, p-1));
   }
 	break;
 	case 9:
-#line 23 "src/json/json_parser.rl"
+#line 23 "src/json_parser.rl"
 	{ tstart=p; }
 	break;
 	case 10:
-#line 23 "src/json/json_parser.rl"
+#line 23 "src/json_parser.rl"
 	{
     PB(json_string(tstart, p));
   }
 	break;
 	case 11:
-#line 31 "src/json/json_parser.rl"
+#line 31 "src/json_parser.rl"
 	{ {stack[top++] = cs; cs = 36; goto _again;} }
 	break;
 	case 12:
-#line 32 "src/json/json_parser.rl"
+#line 32 "src/json_parser.rl"
 	{ {stack[top++] = cs; cs = 97; goto _again;} }
 	break;
 	case 13:
-#line 37 "src/json/json_parser.rl"
+#line 37 "src/json_parser.rl"
 	{ 
     if (values.size() < 3) throw "invalid format";
     jsonValue* v = values.back();
@@ -546,19 +573,19 @@ _match:
   }
 	break;
 	case 14:
-#line 49 "src/json/json_parser.rl"
+#line 49 "src/json_parser.rl"
 	{ PB(new jsonHash());}
 	break;
 	case 15:
-#line 49 "src/json/json_parser.rl"
+#line 49 "src/json_parser.rl"
 	{ {cs = stack[--top]; goto _again;} }
 	break;
 	case 16:
-#line 53 "src/json/json_parser.rl"
+#line 53 "src/json_parser.rl"
 	{ array_i.push_back(values.size()); }
 	break;
 	case 17:
-#line 53 "src/json/json_parser.rl"
+#line 53 "src/json_parser.rl"
 	{ 
     jsonArray* a = new jsonArray();
     for (int i=array_i.back(); i<values.size(); i++) a->push(values[i]);
@@ -568,7 +595,7 @@ _match:
     {cs = stack[--top]; goto _again;}
   }
 	break;
-#line 572 "src/json/json_parser.cc"
+#line 599 "src/json_parser.cc"
 		}
 	}
 
@@ -577,9 +604,54 @@ _again:
 		goto _out;
 	if ( ++p != pe )
 		goto _resume;
+	_test_eof: {}
+	if ( p == eof )
+	{
+	const char *__acts = _jsonParser_actions + _jsonParser_eof_actions[cs];
+	unsigned int __nacts = (unsigned int) *__acts++;
+	while ( __nacts-- > 0 ) {
+		switch ( *__acts++ ) {
+	case 0:
+#line 4 "src/json_parser.rl"
+	{ PB(new jsonNull()); }
+	break;
+	case 1:
+#line 6 "src/json_parser.rl"
+	{ PB(new jsonTrue()); }
+	break;
+	case 2:
+#line 8 "src/json_parser.rl"
+	{ PB(new jsonFalse()); }
+	break;
+	case 4:
+#line 11 "src/json_parser.rl"
+	{
+    PB(json_number(tstart, p, numbuf, numbufsz));
+  }
+	break;
+	case 5:
+#line 15 "src/json_parser.rl"
+	{ PB(new jsonNumber(INFINITY)); }
+	break;
+	case 6:
+#line 17 "src/json_parser.rl"
+	{ PB(new jsonNumber(-INFINITY)); }
+	break;
+	case 8:
+#line 19 "src/json_parser.rl"
+	{
+    PB(json_string(tstart+1, p-1));
+  }
+	break;
+#line 647 "src/json_parser.cc"
+		}
+	}
+	}
+
 	_out: {}
 	}
-#line 111 "src/json/json_parser.rl"
+
+#line 111 "src/json_parser.rl"
 
   if (p != pe)
   {
