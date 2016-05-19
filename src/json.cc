@@ -57,11 +57,6 @@ jsonValue::~jsonValue()
 {
 }
 
-bool jsonValue::is_type(jsonType ty)
-{
-  return (this->type() == ty);
-}
-
 void jsonValue::ref_incr()
 {
   this->ref_count++;
@@ -112,29 +107,14 @@ void jsonNull::output(std::ostream& s)
   s << "null";
 }
 
-jsonType jsonNull::type()
-{
-  return jsonTyNull;
-}
-
 void jsonTrue::output(std::ostream& s)
 {
   s << "true";
 }
 
-jsonType jsonTrue::type()
-{
-  return jsonTyTrue;
-}
-
 void jsonFalse::output(std::ostream& s)
 {
   s << "false";
-}
-
-jsonType jsonFalse::type()
-{
-  return jsonTyFalse;
 }
 
 jsonNumber::jsonNumber(double value)
@@ -160,11 +140,6 @@ void jsonNumber::output(std::ostream& s) {
   }
 }
 
-jsonType jsonNumber::type()
-{
-  return jsonTyNumber;
-}
-
 jsonString::jsonString(std::string& value)
 {
   this->value = value;
@@ -182,11 +157,6 @@ jsonString::jsonString(const char* _value, int len) : value(_value, len)
 void jsonString::output(std::ostream& s)
 {
   s << '"' << value << '"';
-}
-
-jsonType jsonString::type()
-{
-  return jsonTyString;
 }
 
 jsonArrayIterator::jsonArrayIterator(jsonArray *array)
@@ -326,11 +296,6 @@ jsonValue* jsonArray::get(int index)
   return NULL;
 }
 
-jsonType jsonArray::type()
-{
-  return jsonTyArray;
-}
-
 jsonHash::jsonHash()
 {
   head = tail = NULL;
@@ -409,13 +374,13 @@ bool jsonHash::has_key(jsonString* key)
 bool jsonHash::get_bool(const char* key, bool default_value)
 {
   jsonValue* v = get(key);
-  if (v != NULL)
+  if (v)
   {
-    if (v->is_type(jsonTyTrue))
+    if (v->asTrue())
     {
       return true;
     }
-    else if (v->is_type(jsonTyFalse))
+    else if (v->asFalse())
     {
       return false;
     }
@@ -433,11 +398,12 @@ bool jsonHash::get_bool(const char* key, bool default_value)
 double jsonHash::get_number(const char* key, double default_value)
 {
   jsonValue* v = get(key);
-  if (v != NULL)
+  if (v)
   {
-    if (v->is_type(jsonTyNumber))
+    jsonNumber *num = v->asNumber();
+    if (num)
     {
-      return ((jsonNumber*)v)->value;
+      return num->value;
     }
     else
     {
@@ -453,11 +419,12 @@ double jsonHash::get_number(const char* key, double default_value)
 std::string& jsonHash::get_string(const char* key)
 {
   jsonValue* v = get(key);
-  if (v != NULL)
+  if (v)
   {
-    if (v->is_type(jsonTyString))
+    jsonString *str = v->asString();
+    if (str)
     {
-      return ((jsonString*)v)->value;
+      return str->value;
     }
     else
     {
@@ -530,9 +497,4 @@ void jsonHash::set(jsonString* key, jsonValue* value)
       tail = t;
     }
   }
-}
-
-jsonType jsonHash::type()
-{
-  return jsonTyHash;
 }

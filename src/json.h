@@ -26,22 +26,10 @@ class jsonString;
 class jsonArray;
 class jsonHash;
 
-enum jsonType {
-    jsonTyNull,
-    jsonTyTrue,
-    jsonTyFalse,
-    jsonTyNumber,
-    jsonTyString,
-    jsonTyArray,
-    jsonTyHash
-};
-
 class jsonValue {
   public:
     jsonValue();
     virtual ~jsonValue();
-    virtual jsonType type() = 0;
-    bool is_type(jsonType t);
     void ref_incr();
     void ref_decr();
     virtual void output(std::ostream& s) = 0;
@@ -62,21 +50,18 @@ class jsonNull : public jsonValue
 {
   public:
     virtual void output(std::ostream& s);
-    virtual jsonType type();
 };
 
 class jsonTrue : public jsonValue
 {
   public:
     virtual void output(std::ostream& s);
-    virtual jsonType type();
 };
 
 class jsonFalse : public jsonValue
 {
   public:
     virtual void output(std::ostream& s);
-    virtual jsonType type();
 };
 
 class jsonNumber : public jsonValue
@@ -89,7 +74,6 @@ class jsonNumber : public jsonValue
 
     jsonNumber(double value);
     virtual void output(std::ostream& s);
-    virtual jsonType type();
 };
 
 class jsonString : public jsonValue
@@ -105,7 +89,6 @@ class jsonString : public jsonValue
     jsonString(const char* _value, int len);
 
     virtual void output(std::ostream& s);
-    virtual jsonType type();
 };
 
 class jsonArrayIterator
@@ -137,7 +120,6 @@ class jsonArray : public jsonValue
     void push(jsonValue* value);
     //void each(void (*iter)(jsonValue*, void*), void* data);
     jsonValue *get(int index);
-    virtual jsonType type();
 };
 
 class jsonHashIterator
@@ -185,5 +167,4 @@ class jsonHash : public jsonValue
     void set(const char* key, const char* value);
     void set(const char* key, std::string& value);
     void set(jsonString* key, jsonValue* value);
-    virtual jsonType type();
 };
