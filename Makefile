@@ -13,5 +13,12 @@ src/json.o: src/json.h src/json_parser.h src/json.cc
 src/test.o: src/json.h src/json_parser.h src/test.cc
 	${CXX} -c src/test.cc -o $@ -I./src
 
+format:
+	sh format.sh src/json.cc
+	sh format.sh src/json.h
+	sh format.sh src/json_parser.cc
+	sh format.sh src/json_parser.h
+	sh format.sh src/test.cc
+
 clean:
 	rm -f src/test src/*.o
