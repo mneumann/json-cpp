@@ -1,0 +1,4 @@
+* Use std::shared_ptr instead of our own ref counting.
+* Escape special characters in output().
+* Output indentation
+* Use exception classes

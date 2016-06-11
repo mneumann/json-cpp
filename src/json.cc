@@ -2,11 +2,6 @@
 #include <math.h>
 #include <string.h>
 
-/* TODO:
- *   output indentation
- *   escape string (\0 characters in string?)
- */
-
 struct jsonArrayItem {
   jsonValue *value;
   jsonArrayItem *next;

@@ -14,12 +14,12 @@
        (k = iter.current_key(), v = iter.current_value(), k) != NULL;          \
        iter.next())
 
-struct jsonArrayItem;
-struct jsonHashItem;
-
 /*
  * Forward declarations
  */
+
+struct jsonArrayItem;
+struct jsonHashItem;
 class jsonNull;
 class jsonTrue;
 class jsonFalse;
