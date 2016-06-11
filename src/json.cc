@@ -1,38 +1,31 @@
 #include "json.h"
-#include <string.h>
 #include <math.h>
+#include <string.h>
 
 /* TODO:
  *   output indentation
  *   escape string (\0 characters in string?)
  */
 
-struct jsonArrayItem
-{
-  jsonValue* value;
-  jsonArrayItem* next;
+struct jsonArrayItem {
+  jsonValue *value;
+  jsonArrayItem *next;
 
-  jsonArrayItem(jsonValue* value, jsonArrayItem* next=NULL)
-  {
+  jsonArrayItem(jsonValue *value, jsonArrayItem *next = NULL) {
     this->value = value;
     this->next = next;
     this->value->ref_incr();
   }
 
-  ~jsonArrayItem()
-  {
-    this->value->ref_decr();
-  }
+  ~jsonArrayItem() { this->value->ref_decr(); }
 };
 
-struct jsonHashItem
-{
-  jsonString* key;
-  jsonValue* value;
-  jsonHashItem* next;
+struct jsonHashItem {
+  jsonString *key;
+  jsonValue *value;
+  jsonHashItem *next;
 
-  jsonHashItem(jsonString* key, jsonValue* value, jsonHashItem* next=NULL)
-  {
+  jsonHashItem(jsonString *key, jsonValue *value, jsonHashItem *next = NULL) {
     this->key = key;
     this->value = value;
     this->next = next;
@@ -41,238 +34,145 @@ struct jsonHashItem
     this->value->ref_incr();
   }
 
-  ~jsonHashItem()
-  {
+  ~jsonHashItem() {
     this->key->ref_decr();
     this->value->ref_decr();
   }
 };
 
-jsonValue::jsonValue() 
-{
-  this->ref_count = 1;
+jsonValue::jsonValue() { this->ref_count = 1; }
+
+jsonValue::~jsonValue() {}
+
+void jsonValue::ref_incr() { this->ref_count++; }
+
+void jsonValue::ref_decr() {
+  if (--this->ref_count <= 0)
+    delete this;
 }
 
-jsonValue::~jsonValue()
-{
-}
+jsonNull *jsonValue::asNull() { return dynamic_cast<jsonNull *>(this); }
 
-void jsonValue::ref_incr()
-{
-  this->ref_count++;
-}
+jsonTrue *jsonValue::asTrue() { return dynamic_cast<jsonTrue *>(this); }
 
-void jsonValue::ref_decr()
-{
-  if (--this->ref_count <= 0) delete this;
-}
+jsonFalse *jsonValue::asFalse() { return dynamic_cast<jsonFalse *>(this); }
 
-jsonNull* jsonValue::asNull()
-{
-  return dynamic_cast<jsonNull*>(this);
-}
+jsonNumber *jsonValue::asNumber() { return dynamic_cast<jsonNumber *>(this); }
 
-jsonTrue* jsonValue::asTrue()
-{
-  return dynamic_cast<jsonTrue*>(this);
-}
+jsonString *jsonValue::asString() { return dynamic_cast<jsonString *>(this); }
 
-jsonFalse* jsonValue::asFalse()
-{
-  return dynamic_cast<jsonFalse*>(this);
-}
+jsonArray *jsonValue::asArray() { return dynamic_cast<jsonArray *>(this); }
 
-jsonNumber* jsonValue::asNumber()
-{
-  return dynamic_cast<jsonNumber*>(this);
-}
+jsonHash *jsonValue::asHash() { return dynamic_cast<jsonHash *>(this); }
 
-jsonString* jsonValue::asString()
-{
-  return dynamic_cast<jsonString*>(this);
-}
+void jsonNull::output(std::ostream &s) { s << "null"; }
 
-jsonArray* jsonValue::asArray()
-{
-  return dynamic_cast<jsonArray*>(this);
-}
+void jsonTrue::output(std::ostream &s) { s << "true"; }
 
-jsonHash* jsonValue::asHash()
-{
-  return dynamic_cast<jsonHash*>(this);
-}
+void jsonFalse::output(std::ostream &s) { s << "false"; }
 
-void jsonNull::output(std::ostream& s)
-{
-  s << "null";
-}
+jsonNumber::jsonNumber(double value) { this->value = value; }
 
-void jsonTrue::output(std::ostream& s)
-{
-  s << "true";
-}
-
-void jsonFalse::output(std::ostream& s)
-{
-  s << "false";
-}
-
-jsonNumber::jsonNumber(double value)
-{
-  this->value = value;
-}
-
-void jsonNumber::output(std::ostream& s) { 
-  if (isinf(value))
-  {
-    if (value < 0.0)
-    {
+void jsonNumber::output(std::ostream &s) {
+  if (isinf(value)) {
+    if (value < 0.0) {
       s << "-Infinity";
-    }
-    else
-    {
+    } else {
       s << "Infinity";
     }
-  }
-  else
-  {
-    s << value; 
+  } else {
+    s << value;
   }
 }
 
-jsonString::jsonString(std::string& value)
-{
-  this->value = value;
-}
+jsonString::jsonString(std::string &value) { this->value = value; }
 
-jsonString::jsonString(const char* value)
-{
-  this->value = value;
-}
+jsonString::jsonString(const char *value) { this->value = value; }
 
-jsonString::jsonString(const char* _value, int len) : value(_value, len)
-{
-}
+jsonString::jsonString(const char *_value, int len) : value(_value, len) {}
 
-void jsonString::output(std::ostream& s)
-{
-  s << '"' << value << '"';
-}
+void jsonString::output(std::ostream &s) { s << '"' << value << '"'; }
 
-jsonArrayIterator::jsonArrayIterator(jsonArray *array)
-{
+jsonArrayIterator::jsonArrayIterator(jsonArray *array) {
   this->array = array;
   this->array->ref_incr();
   this->pos = this->array->head;
 }
 
-jsonArrayIterator::~jsonArrayIterator()
-{
-  this->array->ref_decr();
-}
+jsonArrayIterator::~jsonArrayIterator() { this->array->ref_decr(); }
 
-void jsonArrayIterator::next()
-{
-  if (this->pos != NULL)
-  {
+void jsonArrayIterator::next() {
+  if (this->pos != NULL) {
     this->pos = this->pos->next;
   }
 }
 
-jsonValue *jsonArrayIterator::current()
-{
-  if (this->pos != NULL)
-  {
+jsonValue *jsonArrayIterator::current() {
+  if (this->pos != NULL) {
     return this->pos->value;
-  }
-  else
-  {
+  } else {
     return NULL;
   }
 }
 
-jsonHashIterator::jsonHashIterator(jsonHash *hash)
-{
+jsonHashIterator::jsonHashIterator(jsonHash *hash) {
   this->hash = hash;
   this->hash->ref_incr();
   this->pos = this->hash->head;
 }
 
-jsonHashIterator::~jsonHashIterator()
-{
-  this->hash->ref_decr();
-}
+jsonHashIterator::~jsonHashIterator() { this->hash->ref_decr(); }
 
-void jsonHashIterator::next()
-{
-  if (this->pos != NULL)
-  {
+void jsonHashIterator::next() {
+  if (this->pos != NULL) {
     this->pos = this->pos->next;
   }
 }
 
-jsonString *jsonHashIterator::current_key()
-{
-  if (this->pos != NULL)
-  {
+jsonString *jsonHashIterator::current_key() {
+  if (this->pos != NULL) {
     return this->pos->key;
-  }
-  else
-  {
+  } else {
     return NULL;
   }
 }
 
-jsonValue *jsonHashIterator::current_value()
-{
-  if (this->pos != NULL)
-  {
+jsonValue *jsonHashIterator::current_value() {
+  if (this->pos != NULL) {
     return this->pos->value;
-  }
-  else
-  {
+  } else {
     return NULL;
   }
 }
 
-jsonArray::jsonArray()
-{
-  head = tail = NULL;
-}
+jsonArray::jsonArray() { head = tail = NULL; }
 
-jsonArray::~jsonArray()
-{
-  jsonArrayItem* j;
-  for (jsonArrayItem* i=head; i != NULL; )
-  {
+jsonArray::~jsonArray() {
+  jsonArrayItem *j;
+  for (jsonArrayItem *i = head; i != NULL;) {
     j = i->next;
     delete i;
     i = j;
   }
 }
 
-void jsonArray::output(std::ostream& s) 
-{
+void jsonArray::output(std::ostream &s) {
   s << "[";
-  for (jsonArrayItem* i=head; i != NULL; i=i->next)
-  {
-    if (i != head) s << ", ";
+  for (jsonArrayItem *i = head; i != NULL; i = i->next) {
+    if (i != head)
+      s << ", ";
     i->value->output(s);
   }
   s << "]";
 }
 
-void jsonArray::push(jsonValue* value)
-{
-  jsonArrayItem* i = new jsonArrayItem(value);
+void jsonArray::push(jsonValue *value) {
+  jsonArrayItem *i = new jsonArrayItem(value);
 
-  if (head == NULL)
-  {
-    head = tail = i; 
-  }
-  else
-  {
-    tail->next = i; 
+  if (head == NULL) {
+    head = tail = i;
+  } else {
+    tail->next = i;
     tail = i;
   }
 }
@@ -286,38 +186,30 @@ void jsonArray::push(jsonValue* value)
 }
 */
 
-jsonValue* jsonArray::get(int index)
-{
-  for (jsonArrayItem* i=head; i != NULL; i=i->next, index--)
-  {
+jsonValue *jsonArray::get(int index) {
+  for (jsonArrayItem *i = head; i != NULL; i = i->next, index--) {
     if (index == 0)
-      return i->value; 
+      return i->value;
   }
   return NULL;
 }
 
-jsonHash::jsonHash()
-{
-  head = tail = NULL;
-}
+jsonHash::jsonHash() { head = tail = NULL; }
 
-jsonHash::~jsonHash()
-{
-  jsonHashItem* j;
-  for (jsonHashItem* i=head; i != NULL; )
-  {
+jsonHash::~jsonHash() {
+  jsonHashItem *j;
+  for (jsonHashItem *i = head; i != NULL;) {
     j = i->next;
     delete i;
     i = j;
   }
 }
 
-void jsonHash::output(std::ostream& s) 
-{
+void jsonHash::output(std::ostream &s) {
   s << "{";
-  for (jsonHashItem* i=head; i != NULL; i=i->next)
-  {
-    if (i != head) s << ", " << std::endl;
+  for (jsonHashItem *i = head; i != NULL; i = i->next) {
+    if (i != head)
+      s << ", " << std::endl;
     i->key->output(s);
     s << ": ";
     i->value->output(s);
@@ -334,153 +226,101 @@ void jsonHash::output(std::ostream& s)
 }
 */
 
-jsonValue* jsonHash::get(const char* key)
-{
-  for (jsonHashItem* i=head; i != NULL; i=i->next)
-  {
-    if (i->key->value == key)
-    {
+jsonValue *jsonHash::get(const char *key) {
+  for (jsonHashItem *i = head; i != NULL; i = i->next) {
+    if (i->key->value == key) {
       return i->value;
     }
   }
   return NULL;
 }
 
-jsonValue* jsonHash::get(std::string& key)
-{
-  return get(key.c_str());
-}
+jsonValue *jsonHash::get(std::string &key) { return get(key.c_str()); }
 
-jsonValue* jsonHash::get(jsonString* key)
-{
-  return get(key->value);
-}
+jsonValue *jsonHash::get(jsonString *key) { return get(key->value); }
 
-bool jsonHash::has_key(const char* key)
-{
-  return (get(key) != NULL);
-}
+bool jsonHash::has_key(const char *key) { return (get(key) != NULL); }
 
-bool jsonHash::has_key(std::string& key)
-{
-  return (get(key.c_str()) != NULL);
-}
+bool jsonHash::has_key(std::string &key) { return (get(key.c_str()) != NULL); }
 
-bool jsonHash::has_key(jsonString* key)
-{
-  return (get(key) != NULL);
-}
+bool jsonHash::has_key(jsonString *key) { return (get(key) != NULL); }
 
-bool jsonHash::get_bool(const char* key, bool default_value)
-{
-  jsonValue* v = get(key);
-  if (v)
-  {
-    if (v->asTrue())
-    {
+bool jsonHash::get_bool(const char *key, bool default_value) {
+  jsonValue *v = get(key);
+  if (v) {
+    if (v->asTrue()) {
       return true;
-    }
-    else if (v->asFalse())
-    {
+    } else if (v->asFalse()) {
       return false;
-    }
-    else
-    {
+    } else {
       throw "invalid type cast";
     }
-  }
-  else
-  {
+  } else {
     return default_value;
   }
 }
 
-double jsonHash::get_number(const char* key, double default_value)
-{
-  jsonValue* v = get(key);
-  if (v)
-  {
+double jsonHash::get_number(const char *key, double default_value) {
+  jsonValue *v = get(key);
+  if (v) {
     jsonNumber *num = v->asNumber();
-    if (num)
-    {
+    if (num) {
       return num->value;
-    }
-    else
-    {
+    } else {
       throw "invalid type cast";
     }
-  }
-  else
-  {
+  } else {
     return default_value;
   }
 }
 
-std::string& jsonHash::get_string(const char* key)
-{
-  jsonValue* v = get(key);
-  if (v)
-  {
+std::string &jsonHash::get_string(const char *key) {
+  jsonValue *v = get(key);
+  if (v) {
     jsonString *str = v->asString();
-    if (str)
-    {
+    if (str) {
       return str->value;
-    }
-    else
-    {
+    } else {
       throw "invalid type cast";
     }
-  }
-  else
-  {
+  } else {
     throw "key not found";
   }
 }
 
-void jsonHash::set(const char* key, jsonValue* value)
-{
+void jsonHash::set(const char *key, jsonValue *value) {
   set(new jsonString(key), value);
 }
 
-void jsonHash::set(const char* key, double value)
-{
+void jsonHash::set(const char *key, double value) {
   set(new jsonString(key), new jsonNumber(value));
 }
 
-void jsonHash::set(const char* key, int value)
-{
+void jsonHash::set(const char *key, int value) {
   set(new jsonString(key), new jsonNumber(value));
 }
 
-void jsonHash::set(const char* key, bool value)
-{
-  set(new jsonString(key), value ? (jsonValue*)new jsonTrue() : (jsonValue*)new jsonFalse());
+void jsonHash::set(const char *key, bool value) {
+  set(new jsonString(key),
+      value ? (jsonValue *)new jsonTrue() : (jsonValue *)new jsonFalse());
 }
 
-void jsonHash::set(const char* key, const char* value)
-{
+void jsonHash::set(const char *key, const char *value) {
   set(new jsonString(key), new jsonString(value));
 }
 
-void jsonHash::set(const char* key, std::string& value)
-{
+void jsonHash::set(const char *key, std::string &value) {
   set(new jsonString(key), new jsonString(value));
 }
 
-void jsonHash::set(jsonString* key, jsonValue* value)
-{
-  if (head == NULL)
-  {
-    head = tail = new jsonHashItem(key, value); 
-  }
-  else
-  {
+void jsonHash::set(jsonString *key, jsonValue *value) {
+  if (head == NULL) {
+    head = tail = new jsonHashItem(key, value);
+  } else {
     bool duplicate = false;
 
-    for (jsonHashItem* i=head; i != NULL; i=i->next)
-    {
-      if (i->key->value == key->value)
-      {
+    for (jsonHashItem *i = head; i != NULL; i = i->next) {
+      if (i->key->value == key->value) {
         i->key->ref_decr();
         i->value->ref_decr();
         i->key = key;
@@ -490,10 +330,9 @@ void jsonHash::set(jsonString* key, jsonValue* value)
       }
     }
 
-    if (!duplicate)
-    {
-      jsonHashItem* t = new jsonHashItem(key, value);
-      tail->next = t; 
+    if (!duplicate) {
+      jsonHashItem *t = new jsonHashItem(key, value);
+      tail->next = t;
       tail = t;
     }
   }

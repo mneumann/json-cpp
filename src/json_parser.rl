@@ -52,7 +52,7 @@
     whitespace* ( (any_value (whitespace* "," whitespace* any_value)*)? whitespace* "]" )
   ) >{ array_i.push_back(values.size()); } @{ 
     jsonArray* a = new jsonArray();
-    for (int i=array_i.back(); i<values.size(); i++) a->push(values[i]);
+    for (int i = array_i.back(); i < values.size(); i++) a->push(values[i]);
     while (values.size() > array_i.back()) values.pop_back();
     PB(a);
     array_i.pop_back();
