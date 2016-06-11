@@ -70,12 +70,12 @@
 
 #define PB(x) values.push_back(x)
 
-inline static jsonString* json_string(char* from, char* to)
+inline static jsonString* json_string(const char* from, const char* to)
 {
   return new jsonString(from, to-from);
 }
 
-inline static jsonNumber* json_number(char* from, char* to, char* buf, int maxsz)
+inline static jsonNumber* json_number(const char* from, const char* to, char* buf, int maxsz)
 {
   const int sz = to-from; 
 
@@ -89,7 +89,7 @@ inline static jsonNumber* json_number(char* from, char* to, char* buf, int maxsz
 
 %% write data;
 
-jsonValue* jsonParser::parse(char* content, int size)
+jsonValue* jsonParser::parse(const char* content, int size)
 {
   int cs;
   int top;
@@ -97,13 +97,13 @@ jsonValue* jsonParser::parse(char* content, int size)
   char numbuf[61];
   const int numbufsz = 60;
 
-  char *ps = content;
-  char *p = ps;
-  char *pe = content + size;
-  char *eof = pe;
+  const char *ps = content;
+  const char *p = ps;
+  const char *pe = content + size;
+  const char *eof = pe;
 
   // user defined
-  char* tstart = NULL; 
+  const char* tstart = NULL; 
   std::vector<jsonValue*> values; 
   std::vector<int> array_i;
 
@@ -113,7 +113,7 @@ jsonValue* jsonParser::parse(char* content, int size)
   if (p != pe)
   {
     int err_pos = (int)(p-ps);
-    std::cout << "error at: " << err_pos << std::endl;
+    std::cerr << "error at: " << err_pos << std::endl;
     throw "error occured while parsing";
   }
 
@@ -162,7 +162,7 @@ jsonValue* jsonParser::parse_file(const char* filename)
     throw "couldn't read entire file";
   }
 
-  res = jsonParser::parse((char*)mem, size);
+  res = jsonParser::parse((const char*)mem, size);
 
   free(mem);
   close(fh);

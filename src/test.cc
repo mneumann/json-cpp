@@ -6,7 +6,7 @@
 int main(int argc, char **argv) {
     using namespace std;
 
-    char *json = "{\"test\": 123.123, \"ary\": [\"abc\", true]}";
+    const char *json = "{\"test\": 123.123, \"ary\": [\"abc\", true]}";
     jsonValue *val = jsonParser::parse(json, strlen(json));
 
     val->output(cout);
